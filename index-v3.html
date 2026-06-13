@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>財富階梯測驗 V3.1｜你真正在第幾層？</title>
+<meta name="description" content="18題精準診斷，找出你在《財富階梯》六層框架中的真實位置。"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪜</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+/* ── reset & vars ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0F;--s1:#14141F;--s2:#1C1C2A;--s3:#242435;
+  --border:rgba(255,255,255,0.07);--text:#EDEFF5;--muted:#9090A8;
+  --gold:#C4A96A;--gold-l:#E8C86A;
+  --r:18px;--ease:.26s cubic-bezier(.4,0,.2,1);
+  --L1:#5B8DB8;--L2:#6BA8C4;--L3:#A4BEC8;
+  --L4:#C4A96A;--L5:#D4A843;--L6:#E8C86A;
+}
+html{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px 60px;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 90% 55% at 50% -5%,rgba(91,141,184,.15) 0%,transparent 65%),
+  radial-gradient(ellipse 50% 35% at 100% 90%,rgba(196,169,106,.07) 0%,transparent 55%);
+  pointer-events:none;z-index:0}
+#particles-js{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── screens ── */
+.screen{display:none;width:100%;max-width:680px;position:relative;z-index:1;animation:fadeUp .36s ease both}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── card ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r)}
+
+/* ══════════════════════════════
+   WELCOME
+══════════════════════════════ */
+#screen-welcome .card{padding:52px 44px;text-align:center}
+.badge-pill{display:inline-block;background:rgba(196,169,106,.1);border:1px solid rgba(196,169,106,.25);color:var(--gold);padding:5px 18px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:28px}
+.hero-h1{font-size:clamp(30px,5.5vw,46px);font-weight:900;line-height:1.16;margin-bottom:16px;background:linear-gradient(140deg,#fff 15%,var(--gold-l) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:16px;line-height:1.88;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;color:var(--muted)}
+.stats-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+.stat-chip{background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:7px 16px;font-size:14px;color:var(--muted)}
+.stat-chip strong{color:var(--text)}
+/* fear grid */
+.fear-head{margin-bottom:24px}
+.fear-lbl{font-size:clamp(30px,5.5vw,46px);font-weight:900;color:var(--gold);line-height:1.16;margin-bottom:10px}
+.fear-hint{font-size:14px;color:var(--muted)}
+.fear-grid{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.fear-item{background:var(--s2);border:1.5px solid var(--border);border-radius:12px;padding:12px 15px;font-size:13.5px;line-height:1.6;cursor:pointer;transition:var(--ease);display:flex;gap:11px;align-items:flex-start;text-align:left}
+.fear-item:hover{border-color:rgba(196,169,106,.3)}
+.fear-item.picked{border-color:var(--gold);background:rgba(196,169,106,.07)}
+.fear-ltr{width:24px;min-width:24px;height:24px;border-radius:6px;background:var(--s1);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--muted);flex-shrink:0;margin-top:1px;transition:var(--ease)}
+.fear-item.picked .fear-ltr{background:var(--gold);border-color:var(--gold);color:#0A0A0F}
+.fear-txt{color:var(--muted);transition:var(--ease)}
+.fear-item.picked .fear-txt{color:var(--text)}
+.fear-hi{color:var(--gold);font-weight:700}
+.fear-count{font-size:12px;color:var(--muted);margin-bottom:28px;transition:var(--ease)}
+.fear-count.max{color:var(--gold)}
+/* start btn */
+.btn-gold{display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-l) 100%);color:#0A0A0F;border:none;border-radius:100px;padding:17px 48px;font-size:17px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:.02em;width:100%;transition:var(--ease)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(196,169,106,.32)}
+.btn-gold:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ══════════════════════════════
+   QUIZ
+══════════════════════════════ */
+#screen-quiz{padding-top:0}
+.quiz-prog-wrap{margin-bottom:16px}
+.quiz-prog-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prog-dim{font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--gold);text-transform:uppercase}
+.prog-num{font-size:12px;color:var(--muted)}
+.prog-track{height:3px;background:var(--s2);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--L1),var(--L3),var(--gold));transition:width .5s ease}
+#screen-quiz .card{padding:32px 32px 24px}
+.q-sub-notice{background:rgba(196,169,106,.08);border:1px solid rgba(196,169,106,.22);border-radius:10px;padding:11px 16px;font-size:14px;color:var(--gold);margin-bottom:14px;display:none}
+.q-sub-notice.show{display:block}
+.q-text{font-size:clamp(20px,3.5vw,24px);font-weight:700;line-height:1.44;margin-bottom:24px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:var(--s2);border:1.5px solid var(--border);border-radius:13px;padding:14px 18px;display:flex;align-items:flex-start;gap:13px;cursor:pointer;transition:var(--ease);text-align:left;color:var(--text);font-size:16px;line-height:1.56;width:100%;font-family:inherit}
+.opt:hover{border-color:rgba(196,169,106,.36);background:rgba(196,169,106,.05)}
+.opt.picked{border-color:var(--gold);background:rgba(196,169,106,.1)}
+.opt.sub-opt{border-style:dashed;border-color:rgba(196,169,106,.3)}
+.opt.sub-opt:hover{border-style:solid}
+.opt-ltr{width:26px;min-width:26px;height:26px;border-radius:50%;background:var(--s1);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;transition:var(--ease)}
+.opt.picked .opt-ltr{background:var(--gold);border-color:var(--gold);color:#0A0A0F}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.btn-prev-q{background:transparent;border:1px solid var(--border);border-radius:100px;padding:10px 22px;font-size:13.5px;color:var(--muted);cursor:pointer;font-family:inherit;transition:var(--ease)}
+.btn-prev-q:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.btn-next-q{background:var(--gold);color:#0A0A0F;border:none;border-radius:100px;padding:11px 28px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;opacity:0;pointer-events:none;transform:translateX(8px);transition:var(--ease)}
+.btn-next-q.show{opacity:1;pointer-events:all;transform:translateX(0)}
+.btn-next-q:hover{box-shadow:0 4px 16px rgba(196,169,106,.38)}
+
+/* ══════════════════════════════
+   CALCULATING
+══════════════════════════════ */
+#screen-calculating .card{padding:64px 44px;text-align:center}
+.spinner{width:54px;height:54px;border:3px solid var(--s2);border-top-color:var(--gold);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 28px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.calc-lbl{font-size:16px;color:var(--muted);margin-bottom:28px}
+.calc-steps{display:inline-flex;flex-direction:column;gap:12px;text-align:left}
+.calc-step{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--muted);opacity:0;transition:opacity .5s ease}
+.calc-step.show{opacity:1}
+.c-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:var(--gold)}
+
+/* ══════════════════════════════
+   RESULTS
+══════════════════════════════ */
+#screen-results .card{overflow:hidden}
+
+/* level hero */
+.res-hero{padding:44px 40px 36px;text-align:center;border-bottom:1px solid var(--border);position:relative}
+.res-hero::before{content:'';position:absolute;inset:0;opacity:.06;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 50%,currentColor,transparent)}
+.lvl-badge-tag{font-size:clamp(20px,4.5vw,40px);font-weight:700;letter-spacing:.04em;margin-bottom:10px;opacity:.7}
+.lvl-freedom{font-size:clamp(36px,7vw,56px);font-weight:900;line-height:1.1;margin-bottom:8px}
+.lvl-stage{font-size:clamp(20px,4.5vw,40px);font-weight:500;color:var(--text);margin-bottom:10px;opacity:.9}
+.lvl-motto{font-size:14px;font-style:italic;opacity:.55;letter-spacing:.01em}
+/* score bars */
+.score-bars{padding:24px 40px;border-bottom:1px solid var(--border);background:var(--s2)}
+.score-bars-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--muted);margin-bottom:16px}
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.score-row:last-child{margin-bottom:0}
+.score-dim-lbl{font-size:12px;font-weight:700;color:var(--muted);width:60px;flex-shrink:0}
+.score-bar-track{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:100px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:100px;transition:width 1s ease}
+.score-pct{font-size:12px;color:var(--muted);width:36px;text-align:right;flex-shrink:0}
+/* result body */
+.res-body{padding:36px 40px}
+/* section tag */
+.sec-tag{font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sec-tag::after{content:'';flex:1;height:1px;background:var(--border)}
+/* insight cards */
+.insight-card{border-radius:13px;padding:18px 20px;margin-bottom:16px}
+.insight-card.advance{background:rgba(107,168,196,.07);border:1px solid rgba(107,168,196,.22)}
+.insight-card.misalign{background:rgba(196,169,106,.06);border:1px solid rgba(196,169,106,.2)}
+.insight-card-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:8px}
+.insight-card.advance .insight-card-lbl{color:var(--L2)}
+.insight-card.misalign .insight-card-lbl{color:var(--gold)}
+.insight-card-txt{font-size:16px;line-height:1.72;color:var(--muted)}
+.insight-card-txt strong{color:var(--text)}
+/* strategy */
+.strategy-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:13px;padding:18px 20px;margin-bottom:20px}
+.strategy-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--muted);margin-bottom:10px}
+.strategy-txt{font-size:16px;line-height:1.75;color:var(--muted)}
+/* mori */
+.mori-box{background:rgba(196,169,106,.05);border:1px solid rgba(196,169,106,.18);border-radius:13px;padding:18px 20px;margin-bottom:20px}
+.mori-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--gold);margin-bottom:10px}
+.mori-txt{font-size:16px;line-height:1.75;color:var(--muted)}
+.mori-txt strong{color:var(--text)}
+/* actions */
+.actions-wrap{margin-bottom:20px}
+.actions-sub-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px;padding:4px 10px;background:var(--s2);border-radius:6px;display:inline-block}
+.action-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.action-item{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;display:flex;gap:13px;align-items:flex-start}
+.action-num{width:26px;height:26px;min-width:26px;border-radius:50%;background:rgba(196,169,106,.1);border:1.5px solid rgba(196,169,106,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--gold);flex-shrink:0}
+.action-num.keep{background:rgba(107,168,196,.1);border-color:rgba(107,168,196,.3);color:var(--L2)}
+.action-txt{font-size:16px;line-height:1.68;color:var(--muted)}
+/* email */
+.email-box{background:var(--s2);border:1px solid var(--border);border-radius:13px;padding:22px 22px 18px;margin-bottom:20px}
+.email-lbl{font-size:16px;font-weight:700;margin-bottom:4px}
+.email-sublbl{font-size:14px;color:var(--muted);margin-bottom:14px}
+.email-row{display:flex;gap:9px;margin-bottom:10px}
+.email-inp{flex:1;background:var(--s1);border:1.5px solid var(--border);border-radius:100px;padding:12px 20px;color:var(--text);font-size:16px;outline:none;font-family:inherit;transition:var(--ease)}
+.email-inp:focus{border-color:rgba(196,169,106,.45)}
+.email-inp::placeholder{color:var(--muted)}
+.btn-subscribe{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#0A0A0F;border:none;border-radius:100px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:var(--ease)}
+.btn-subscribe:hover{box-shadow:0 4px 16px rgba(196,169,106,.35)}
+.btn-skip-email{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;transition:var(--ease)}
+.btn-skip-email:hover{color:var(--text)}
+.email-done{font-size:14px;color:var(--gold);display:none}
+/* cta poem */
+.cta-wrap{text-align:center;padding-top:8px;border-top:1px solid var(--border);padding-top:24px}
+.cta-poem{margin-bottom:24px;line-height:2.1}
+.cta-poem p{font-size:16px;color:var(--muted)}
+.cta-poem .strong-line{color:var(--text);font-weight:700;font-size:16px}
+.cta-poem .gold-line{color:var(--gold);font-weight:700;font-size:16px}
+/* buttons */
+.btn-row{display:flex;flex-direction:column;gap:10px}
+.btn-line{display:flex;align-items:center;justify-content:center;gap:10px;background:#06C755;color:#fff;border:none;border-radius:100px;padding:17px 38px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;transition:var(--ease);width:100%}
+.btn-line:hover{box-shadow:0 8px 26px rgba(6,199,85,.3);transform:translateY(-2px)}
+.btn-sec-row{display:flex;gap:10px}
+.btn-ghost-sec{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;border:1.5px solid var(--border);border-radius:100px;padding:13px 16px;font-size:16px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:var(--ease)}
+.btn-ghost-sec:hover{border-color:rgba(255,255,255,.22);color:var(--text)}
+.btn-retake{display:block;margin:16px auto 0;background:transparent;border:none;color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit;text-decoration:underline}
+.btn-retake:hover{color:var(--text)}
+
+/* ── responsive ── */
+@media(max-width:520px){
+  #screen-welcome .card{padding:32px 22px}
+  #screen-quiz .card{padding:24px 18px 20px}
+  #screen-calculating .card{padding:48px 24px}
+  .res-hero,.res-body{padding:28px 22px}
+  .score-bars{padding:20px 22px}
+  .btn-sec-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div id="particles-js"></div>
+
+<!-- ══════════════════════════════
+     WELCOME
+══════════════════════════════ -->
+<div id="screen-welcome" class="screen active">
+  <div class="card">
+    <div class="badge-pill">📖 《財富階梯》六層診斷</div>
+    <h1 class="hero-h1">你真正在<br>財富的第幾層</h1>
+    <p class="hero-sub">大多數人用第四層的策略，解決第一層的問題。<br>這是財務停滯最常見的原因，<br>策略本身沒有問題，問題在於你用錯了層級。</p>
+    <div class="stats-row">
+      <div class="stat-chip">⏱ <strong>5 分鐘</strong>完成</div>
+      <div class="stat-chip">📋 <strong>18</strong> 道題目</div>
+      <div class="stat-chip">🪜 <strong>6</strong> 個財富層級</div>
+    </div>
+
+    <div class="fear-head">
+      <div class="fear-lbl">你不想成為哪種人？</div>
+      <div class="fear-hint">從下面選出最多 5 個你有共鳴的情境，再開始測驗</div>
+    </div>
+
+    <div class="fear-grid" id="fearGrid">
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">A</div>
+        <div class="fear-txt">每次去超市結帳，我都要在心裡默默加總，偶爾看到特價才敢多拿一樣。我不想 <span class="fear-hi">5 年</span>後買東西還要<span class="fear-hi">這樣算來算去</span>。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">B</div>
+        <div class="fear-txt">工作<span class="fear-hi">5 年</span>了，帳戶數字幾乎沒有動過。不是沒努力，是不知道努力的方向對不對。我不想再這樣又過<span class="fear-hi">5 年</span>。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">C</div>
+        <div class="fear-txt">有時候<span class="fear-hi">半夜睡不著</span>，腦子自動開始算帳：房租、水電、孩子的補習費……算完<span class="fear-hi">更睡不著</span>。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">D</div>
+        <div class="fear-txt">朋友說某支股票很好，我跟著買了。跌了之後<span class="fear-hi">不知道要不要賣</span>，只能繼續撐著。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">E</div>
+        <div class="fear-txt">我知道應該要開始規劃退休，但每次想到就覺得太遠、太複雜，<span class="fear-hi">先放著</span>。我不想等到<span class="fear-hi">50 歲</span>才開始後悔。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">F</div>
+        <div class="fear-txt">看到別人在 IG 分享副業收入，我也很想開始，但一打開手機就覺得自己什麼都不會，就這樣拖了<span class="fear-hi">快 1 年</span>。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">G</div>
+        <div class="fear-txt">我曾經嘗試做過一點東西，但<span class="fear-hi">沒有人看、沒有人理</span>，後來就放棄了。現在不確定自己還有沒有勇氣再試一次。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">H</div>
+        <div class="fear-txt">我怕做出來的東西很爛，被人覺得<span class="fear-hi">可笑</span>。所以一直在等<span class="fear-hi">自己準備好</span>再說。只是這一等，就是<span class="fear-hi">好幾年</span>。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">I</div>
+        <div class="fear-txt">我知道 AI 跟數位工具讓副業變容易了，但光是研究要用哪些工具，就複雜到讓我<span class="fear-hi">不想動</span>了。</div>
+      </div>
+      <div class="fear-item" onclick="toggleFear(this)">
+        <div class="fear-ltr">J</div>
+        <div class="fear-txt">工作已經夠累了，下班根本沒有精力做別的。但我也清楚，如果一直這樣，<span class="fear-hi">5 年</span>後還是一樣<span class="fear-hi">累、一樣沒有餘裕</span>。</div>
+      </div>
+    </div>
+    <div class="fear-count" id="fearCount">已選 0 個（最多 5 個）</div>
+
+    <button class="btn-gold" id="startBtn" disabled onclick="startQuiz()">
+      開始測驗 →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     QUIZ
+══════════════════════════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-prog-wrap">
+    <div class="quiz-prog-meta">
+      <span class="prog-dim" id="progDim">S 財務現況</span>
+      <span class="prog-num" id="progNum">1 / 18</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="q-sub-notice" id="subNotice">💡 你選擇的淨資產屬於高淨值層級，請進一步確認你的精確位置</div>
+    <div class="q-text" id="qText"></div>
+    <div class="opts" id="optList"></div>
+    <div class="quiz-footer">
+      <button class="btn-prev-q" id="btnPrev" onclick="prevQ()">← 上一題</button>
+      <button class="btn-next-q" id="btnNext" onclick="nextQ()">下一題 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     CALCULATING
+══════════════════════════════ -->
+<div id="screen-calculating" class="screen">
+  <div class="card">
+    <div class="spinner"></div>
+    <div class="calc-lbl">正在分析你的財富位置…</div>
+    <div class="calc-steps">
+      <div class="calc-step" id="cs1"><div class="c-dot"></div>評估 S 財務現況分數</div>
+      <div class="calc-step" id="cs2"><div class="c-dot"></div>評估 B 財務行為分數</div>
+      <div class="calc-step" id="cs3"><div class="c-dot"></div>評估 M 財務思維分數</div>
+      <div class="calc-step" id="cs4"><div class="c-dot"></div>綜合加權，對應財富層級</div>
+      <div class="calc-step" id="cs5"><div class="c-dot"></div>生成個人化行動建議</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     RESULTS
+══════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div class="card">
+
+    <!-- hero -->
+    <div class="res-hero" id="resHero">
+      <div class="lvl-badge-tag" id="resBadgeTag"></div>
+      <div class="lvl-freedom" id="resFreedom"></div>
+      <div class="lvl-stage" id="resStage"></div>
+      <div class="lvl-motto" id="resMotto"></div>
+    </div>
+
+    <!-- score bars -->
+    <div class="score-bars">
+      <div class="score-bars-title">四維度分數</div>
+      <div class="score-row">
+        <div class="score-dim-lbl">S 財務現況</div>
+        <div class="score-bar-track"><div class="score-bar-fill" id="barS" style="width:0%;background:var(--L2)"></div></div>
+        <div class="score-pct" id="pctS">0%</div>
+      </div>
+      <div class="score-row">
+        <div class="score-dim-lbl">B 財務行為</div>
+        <div class="score-bar-track"><div class="score-bar-fill" id="barB" style="width:0%;background:var(--L3)"></div></div>
+        <div class="score-pct" id="pctB">0%</div>
+      </div>
+      <div class="score-row">
+        <div class="score-dim-lbl">M 財務思維</div>
+        <div class="score-bar-track"><div class="score-bar-fill" id="barM" style="width:0%;background:var(--gold)"></div></div>
+        <div class="score-pct" id="pctM">0%</div>
+      </div>
+      <div class="score-row">
+        <div class="score-dim-lbl">G 財務目標</div>
+        <div class="score-bar-track"><div class="score-bar-fill" id="barG" style="width:0%;background:var(--gold-l)"></div></div>
+        <div class="score-pct" id="pctG">0%</div>
+      </div>
+    </div>
+
+    <div class="res-body">
+
+      <!-- advance / misalign cards (injected by JS) -->
+      <div id="advanceBlock"></div>
+      <div id="misalignBlock"></div>
+
+      <!-- strategy -->
+      <div class="sec-tag">📚 《財富階梯》這樣說</div>
+      <div class="strategy-box">
+        <div class="strategy-txt" id="resStrategy"></div>
+      </div>
+
+      <!-- mori -->
+      <div class="sec-tag">📌 Mori 觀點</div>
+      <div class="mori-box">
+        <div class="mori-txt" id="resMori"></div>
+      </div>
+
+      <!-- actions -->
+      <div class="sec-tag">✅ 行動建議</div>
+      <div class="actions-wrap" id="resActions"></div>
+
+      <!-- email -->
+      <div class="email-box" id="emailBox">
+        <div class="email-lbl">想收到未來的新內容通知？</div>
+        <div class="email-sublbl">留下 Email，Mori 有新的財務思維或工具資源時會第一時間通知你。</div>
+        <div class="email-row">
+          <input class="email-inp" type="email" id="emailInp" placeholder="your@email.com"/>
+          <button class="btn-subscribe" onclick="submitEmail()">訂閱</button>
+        </div>
+        <div class="email-done" id="emailDone">✓ 已訂閱，謝謝！</div>
+        <button class="btn-skip-email" onclick="skipEmail()">跳過，直接下載 PDF</button>
+      </div>
+
+      <!-- cta poem + buttons -->
+      <div class="cta-wrap">
+        <div class="cta-poem">
+          <p class="strong-line">一開始你選的那個5年後的樣子</p>
+          <p class="strong-line">現在的你已經不想要了</p>
+          <p>光是這件事　就比大多數人</p>
+          <p>更往前走了一步</p>
+          <p>改變不是一夜的事</p>
+          <p>但每一個清醒的選擇　都算數</p>
+          <p class="gold-line">接下來的每一步</p>
+          <p class="gold-line">可以從這裡開始</p>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-line" onclick="openLine()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+            加入 LINE
+          </button>
+          <div class="btn-sec-row">
+            <button class="btn-ghost-sec" onclick="openIG()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              追蹤 IG
+            </button>
+            <button class="btn-ghost-sec" id="dlBtn" onclick="downloadPDF()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              下載報告
+            </button>
+          </div>
+        </div>
+        <button class="btn-retake" onclick="retake()">↺ 重新診斷</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCRIPTS
+══════════════════════════════ -->
+<script>
+/* ════════════════════════════════
+   ⚙️  設定區（部署前填入）
+════════════════════════════════ */
+const CFG = {
+  lineUrl: 'https://line.me/R/ti/p/@507wvwbz',
+  igUrl:   'https://instagram.com/mori1024_',
+  mlKey:   '',       // MailerLite Classic API Key
+  mlGroup: '',       // MailerLite 群組 ID
+  cfCounter: '',     // Cloudflare Workers counter URL
+};
+
+/* ════════════════════════════════
+   SUB_Q1 分支（Q1=D 觸發）
+════════════════════════════════ */
+const SUB_Q1 = {
+  dim:'S', isSubQ:true,
+  q:'請進一步確認你的淨資產範圍：',
+  opts:[
+    '320萬 ～ 3,200萬台幣（約 10萬～100萬 USD）',
+    '3,200萬 ～ 3.2億台幣（約 100萬～1,000萬 USD）',
+    '3.2億台幣以上（約 1,000萬 USD 以上）',
+  ],
+  levelOverride:['l4','l5','l6'],
+};
+
+/* ════════════════════════════════
+   18 道題目
+   dim: S=財務現況(6) B=財務行為(6) M=財務思維(4) G=財務目標(2)
+   answers: 0-3 分 (A=0, B=1, C=2, D=3)
+════════════════════════════════ */
+const QS = [
+  // ── S 財務現況 ──────────────────────
+  {dim:'S',dimLbl:'S 財務現況',
+   q:'你的淨資產（所有資產減去所有負債）大約是多少？',
+   opts:['負債中，或淨資產接近於零','正數，但在 30萬台幣以下','30萬 ～ 320萬台幣之間','320萬台幣以上（含投資資產）'],
+   triggerSub:true},
+
+  {dim:'S',dimLbl:'S 財務現況',
+   q:'如果明天突然失業，你的積蓄大概能撐多久？',
+   opts:['不到 1 個月','1 ～ 3 個月','3 個月 ～ 1 年','1 年以上，或被動收入已能覆蓋生活費']},
+
+  {dim:'S',dimLbl:'S 財務現況',
+   q:'每個月，你能固定存下多少比例的收入？',
+   opts:['幾乎沒有，甚至入不敷出','不到 10%（偶爾才存得到）','10 ～ 25%（有點吃力但能做到）','25% 以上，或儲蓄已不是主要關注點']},
+
+  {dim:'S',dimLbl:'S 財務現況',
+   q:'你目前的被動收入狀況是？',
+   opts:['完全沒有','偶爾有，但不穩定（如分紅、零星投資收益）','每月有固定被動收入，但佔總收入比例不高','被動收入已能覆蓋一半以上的基本生活支出']},
+
+  {dim:'S',dimLbl:'S 財務現況',
+   q:'你目前的負債狀況？',
+   opts:['有消費性負債（信用卡循環、分期等），每月利息是負擔','有學貸或車貸，正在償還中','有房貸，但屬於計畫內，不影響現金流','沒有負債，或只有策略性低利率貸款']},
+
+  {dim:'S',dimLbl:'S 財務現況',
+   q:'你的主要收入來源是什麼？',
+   opts:['單一薪資，沒有其他收入','薪資為主，偶爾有其他小收入','薪資加上穩定副業，收入來源多元','多元收入並行，不依賴任何單一來源']},
+
+  // ── B 財務行為 ──────────────────────
+  {dim:'B',dimLbl:'B 財務行為',
+   q:'你目前最花心思在哪個財務行動上？',
+   opts:['讓每個月支出不超過收入','透過副業或技能提升增加收入','讓投資組合穩健持續增長','稅務規劃、資產傳承或集中風險管理']},
+
+  {dim:'B',dimLbl:'B 財務行為',
+   q:'你對副業或額外收入的目前狀態是？',
+   opts:['沒有，也沒有認真考慮','有在嘗試，但還沒有穩定收入','有穩定副業收入，但薪資仍是主要來源','投資或副業已是主要收入，薪資是次要或不必要的']},
+
+  {dim:'B',dimLbl:'B 財務行為',
+   q:'你目前有在定期投資嗎？（如每月定額買 ETF / 基金）',
+   opts:['沒有，還沒開始','偶爾買一點，但很不規律','有，定期定額，已成固定習慣','投資組合已高度自動化，重心轉向資產配置優化']},
+
+  {dim:'B',dimLbl:'B 財務行為',
+   q:'你使用「收費制財務顧問」（fee-only，按時間或固定費收費）嗎？',
+   opts:['沒有，也不知道和一般理財顧問有什麼差異','知道差異，但感覺目前資產規模還用不著','有考慮，正在評估或剛開始使用','有，定期進行資產審視；或已達到考慮家族辦公室的規模']},
+
+  {dim:'B',dimLbl:'B 財務行為',
+   q:'你記錄和追蹤個人財務的習慣是？',
+   opts:['沒有，大概知道收支狀況就好','偶爾記帳，但不規律','有固定追蹤淨資產，每月或每季更新','有完整財務儀表板，追蹤資產配置、稅務、現金流等多維度']},
+
+  {dim:'B',dimLbl:'B 財務行為',
+   q:'面對一筆意外之財（如年終獎金），你通常的第一反應是？',
+   opts:['先想犒賞自己再說','存起來，但沒有具體計畫','按既定比例分配（消費/備用金/投資），幾乎自動執行','合併進整體資產配置，按再平衡計畫處理']},
+
+  // ── M 財務思維 ──────────────────────
+  {dim:'M',dimLbl:'M 財務思維',
+   q:'你對「資產集中風險」的日常關注程度？',
+   opts:['不太了解這個概念','知道要分散，但資產還太少，暫時不是重點','有在主動分散，把資金分布在不同資產類別','這是我最優先關注的風險，集中風險隨時可能帶來不可逆的損傷']},
+
+  {dim:'M',dimLbl:'M 財務思維',
+   q:'你對「稅務規劃」的實際參與程度？',
+   opts:['完全不了解，只知道要繳稅','了解基本概念，但沒有主動做任何規劃','有利用合法工具做一些優化（退休金帳戶、投資工具選擇等）','有系統性稅務規劃，涉及資產傳承、信託或慈善工具']},
+
+  {dim:'M',dimLbl:'M 財務思維',
+   q:'面對市場大幅下跌（30%+），你的實際反應會是？',
+   opts:['我幾乎沒有在市場的資產，影響不大','我會焦慮，可能考慮賣出部分','我能維持紀律不賣，因為策略事先已確立','我更關注的是集中風險，整體市場波動對我反而不是主要擔憂']},
+
+  {dim:'M',dimLbl:'M 財務思維',
+   q:'你認為「金錢」目前對你的生活代表什麼？',
+   opts:['每個月都不夠用，是最大壓力來源','基本夠用，但幾乎沒有餘裕做其他選擇','能讓我做一些想做的事，但仍有很多限制','我任何時候都能對不想做的事說「不」，金錢是工具而非目標']},
+
+  // ── G 財務目標 ──────────────────────
+  {dim:'G',dimLbl:'G 財務目標',
+   q:'你目前有在進行「遺產規劃」或「資產傳承」的安排嗎？',
+   opts:['從來沒想過這個問題','知道重要，但感覺是很遠的事','有基本了解（台灣遺產稅門檻等），但還沒具體行動','有，已和律師或顧問做過具體規劃，涉及信託或家族治理']},
+
+  {dim:'G',dimLbl:'G 財務目標',
+   q:'你對自己財富的「終點」怎麼定義？',
+   opts:['還沒想到這個問題，先活下去再說','希望退休後不用擔心錢的問題','達到財務自由，被動收入覆蓋生活所需','讓財富在我離開後繼續發揮影響力：傳承、公益或家族使命']},
+];
+
+/* ════════════════════════════════
+   六層完整資料
+════════════════════════════════ */
+const LVL = {
+  l1:{
+    badge:'第一階層', freedom:'生存', stage:'財富種子期',
+    motto:'非典型結果，需要非典型行動', mottoEn:'Atypical Results Require Atypical Actions',
+    color:'#5B8DB8',
+    desc:'你是月光族，一個偶發的厄運就可能讓你陷入鉅額債務。這個階段的問題不是花太多，而是賺太少。',
+    strategy:'最常見的錯誤建議是「記帳省錢」，但第一層的問題在於收入太低，不在於支出。你要採取極端手段：打零工、做兩份工作、拚命學習一項技能，目標只有一個：提高收入並建立緊急資金。省下的 $200 永遠比不上多賺的 $2,000。',
+    mori:'我自己在 L1 的時候，花了整整 6 個月研究 ETF 費用比率，卻還沒有第一個月的緊急備用金。<strong>後來某天突然明白：我用 L3 的策略解決 L1 的問題，難怪什麼都動不了。</strong>書裡有句話讓我印象很深：「診斷錯了，所有的治療都是浪費。」你現在在哪裡，才決定你接下來該做什麼。',
+    keep:[],
+    focus:['停止把精力放在省錢，把同樣的時間用在學習一個市場有需求的技能','建立最小緊急備用金（目標：先存到 3 萬台幣，作為緩衝墊）','評估目前工作的收入天花板，制定 12 個月的跳槽或轉職計畫'],
+  },
+  l2:{
+    badge:'第二階層', freedom:'雜貨自由', stage:'財富學習期',
+    motto:'今日學習，終身獲利', mottoEn:'Learn Today, Earn Forever',
+    color:'#6BA8C4',
+    desc:'你在雜貨店可以隨心所欲地買，不必看標價。這個階段是教育投資回報率最高的時期。',
+    strategy:'這是教育回報率最高的階段。你的目標是找到專長、興趣與市場需求的交集點。別沉迷於投資，因為本金少，複利也不大；你的職涯發展才是最大的資產。',
+    mori:'L2 的人常常急著想「投資」，但當本金只有幾十萬，花時間學一個能讓薪水翻倍的技能，<strong>遠比研究哪支股票回報高出好幾倍。</strong>我觀察到一個有趣的現象：很多 L2 的人已經知道要改變，但卡在「從哪裡開始」這個問題。其實先從你最容易開始的地方動起來，比選到最完美的起點更重要。',
+    keep:[],
+    focus:['找到你的「技能—市場」交集：列出 3 個你擅長、市場願意付錢、而且你不討厭的技能','開始小額投資（每月 3,000–5,000 元定期定額 ETF），培養習慣比金額重要','停止比較投資回報，開始比較自己的技能成長速度'],
+  },
+  l3:{
+    badge:'第三階層', freedom:'餐廳自由', stage:'財富複利期',
+    motto:'持續買進', mottoEn:'Just Keep Buying',
+    color:'#A4BEC8',
+    desc:'你上餐廳點菜可以不看價格。你存下的錢已夠多，開始為你生更多錢。',
+    strategy:'持續買進多元分散的指數基金，靠時間的複利慢慢致富。第三層最大的風險是「生活方式膨脹」，買太貴的房子或車子，讓財富停止複利。紀律不是靠意志力，是靠系統設計。',
+    mori:'L3 是個容易讓人感到「已經做對了」的舒適區。<strong>我常常看到的反模式是：花太多時間優化細節（ETF 費用比率、再平衡時機），而不是去做能帶來更大回報的事。</strong>有一次我問一個朋友：「你研究費用比率差 0.05% 省下的錢，和你把這兩個小時拿去學一個新技能，哪個對你未來 5 年更有影響？」他想了很久，沉默地把電腦關掉了。',
+    keep:[],
+    focus:['設定「生活方式上限」：決定一個你不會超過的月支出比例，無論薪水怎麼漲','自動化投資：每月薪水入帳第一件事，先自動扣款進投資帳戶','開始計算「淨值成長率」而非薪水成長率：每季記錄一次總資產'],
+  },
+  l4:{
+    badge:'第四階層', freedom:'旅行自由', stage:'財富轉型期',
+    motto:'讓你到達這裡的，無法帶你走得更遠', mottoEn:"What Got You Here Won't Get You There",
+    color:'#C4A96A',
+    desc:'你已進入富人門檻，可以隨意旅行、住豪華飯店。但這是最難突破的一層，帶你到這裡的方法無法帶你更遠。',
+    strategy:'單純「分散投資」已不夠，而是要在關鍵機會上集中。你必須創業，或加入有爆發潛力的公司獲得股權。使用槓桿（勞動力、資本、內容、程式碼）把你的時間和收入脫鉤。',
+    mori:'這本書裡我最有感的一句話是：<strong>「一個在 L5 完全正確的建議，在 L1 執行不只無效，甚至有害。反過來也是。」</strong>L4 的人往往還在用 L3 的策略，繼續定期定額指數基金，卻沒有意識到他們的財富規模已經需要一套完全不同的作業系統。帶你到這裡的方法，已經到了它的極限。',
+    keep:[],
+    focus:['評估你有沒有可以創業或持股的機會，哪怕是小規模的','開始建立槓桿：內容（YouTube/文章）、程式碼（工具/產品），讓你睡覺時仍然有收入','找一位收費制財務顧問（fee-only），重新審視你的資產配置是否已切換到 L4 策略'],
+  },
+  l5:{
+    badge:'第五階層', freedom:'住宅自由', stage:'財富守護期',
+    motto:'只有偏執狂才能存活', mottoEn:'Only the Paranoid Survive',
+    color:'#D4A843',
+    desc:'你可以不費力買下夢想中的房子。通常到達這一層的人，都是透過出售企業或擁有大量股權。',
+    strategy:'重點是「保護財富」，不是「賺更多」。你需要分散投資，因為讓你致富的集中投資現在可能讓你破產。同時要面對富裕帶來的孤獨感、家族衝突，以及資產集中崩潰的系統性風險。',
+    mori:'到了 L5，大多數的財務教材已經對你失效。<strong>你現在最大的敵人不是市場風險，而是你自己，過度自信、分心於非核心業務、以及被社交義務消耗精力。</strong>偏執不是壞事，是一種防禦機制。書裡說：在某個門檻之間，財富的邊際效用幾乎是平的；但跌破門檻，生活質量會急劇惡化。保護比增長更重要。',
+    keep:[],
+    focus:['把主要財富從集中資產轉向多元分散（房地產、債券、全球指數）','聘請家族辦公室顧問或私人律師，建立資產保護結構（信託、控股公司）','制定一套「家族財富協議」：如何對子女談錢、防止「富不過三代」'],
+  },
+  l6:{
+    badge:'第六階層', freedom:'影響力自由', stage:'財富傳承期',
+    motto:'傳承 = 行動 × 財富', mottoEn:'Legacy = Action × Wealth',
+    color:'#E8C86A',
+    desc:'金錢不再是購買力的象徵，而是改變世界的工具。你實現了影響力自由。',
+    strategy:'遺產 = 行動 × 財富。這一層的挑戰是如何處理離婚（這可能是最大的財富毀滅者）、訴訟，以及如何透過慈善留下遺產。財務問題基本已解決，核心問題完全轉變為：這些財富如何繼續發揮影響力？',
+    mori:'L6 面對的問題對大多數人來說是奢侈的煩惱，但它們是真實的。<strong>真正的挑戰是：你的財富有沒有辦法在你離開後繼續發揮意義？</strong>書裡用一個問題結束對 L6 的討論：「假設你達到財務自由，你的一個典型的星期四是什麼樣的？」這個問題在任何層級都值得回答，越早想清楚，財務目標就越有意義。',
+    keep:[],
+    focus:['建立慈善基金或家族基金會，把捐贈變成一個系統而非隨機決定','撰寫你的「財富哲學」：為什麼累積財富、傳給誰、傳多少、用什麼方式','每年與律師和稅務顧問重新審視遺產規劃，確保符合最新法律'],
+  },
+};
+
+const LVL_ORDER = ['l1','l2','l3','l4','l5','l6'];
+const DIM_MAX = {S:18,B:18,M:12,G:6}; // max points per dim (6*3, 6*3, 4*3, 2*3)
+
+/* ════════════════════════════════
+   狀態
+   answers[i] = answer index (0-3) for queuedQs[i]，undefined=未答
+════════════════════════════════ */
+let cur=0, queuedQs=[], answers=[], subLvl=null, picked=null, lvlKey=null;
+let selectedFears=[];
+
+/* ════════════════════════════════
+   工具
+════════════════════════════════ */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pctToLevel(p){
+  if(p<33) return 0; // l1
+  if(p<55) return 1; // l2
+  return 2;          // l3
+}
+
+/* ════════════════════════════════
+   恐懼情境
+════════════════════════════════ */
+function toggleFear(el){
+  const MAX=5;
+  if(el.classList.contains('picked')){
+    el.classList.remove('picked');
+    selectedFears=selectedFears.filter(x=>x!==el);
+  } else {
+    if(selectedFears.length>=MAX) return;
+    el.classList.add('picked');
+    selectedFears.push(el);
+  }
+  const n=selectedFears.length;
+  const fc=document.getElementById('fearCount');
+  fc.textContent=`已選 ${n} 個（最多 ${MAX} 個）`;
+  fc.classList.toggle('max',n===MAX);
+  document.getElementById('startBtn').disabled=n===0;
+}
+
+/* ════════════════════════════════
+   開始
+════════════════════════════════ */
+function startQuiz(){
+  cur=0; answers=[]; subLvl=null; picked=null;
+  queuedQs=[...QS];
+  renderQ(); go('screen-quiz');
+}
+
+/* ════════════════════════════════
+   渲染題目（含還原上一題選擇）
+════════════════════════════════ */
+function renderQ(){
+  const q=queuedQs[cur];
+  const total=queuedQs.length;
+  const pct=Math.round((cur/total)*100);
+  document.getElementById('progDim').textContent=q.dimLbl||q.dim;
+  document.getElementById('progNum').textContent=`${cur+1} / ${total}`;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('subNotice').classList.toggle('show',!!q.isSubQ);
+  document.getElementById('qText').textContent=q.q;
+
+  const list=document.getElementById('optList');
+  list.innerHTML='';
+  const ltrs=['A','B','C','D'];
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt'+(q.isSubQ?' sub-opt':'');
+    btn.innerHTML=`<div class="opt-ltr">${ltrs[i]}</div><div>${o}</div>`;
+    btn.onclick=()=>pickOpt(i,btn,q);
+    list.appendChild(btn);
+  });
+
+  // 還原上一題的選擇
+  picked = answers[cur]!==undefined ? answers[cur] : null;
+  const nb=document.getElementById('btnNext');
+  if(picked!==null){
+    list.querySelectorAll('.opt')[picked]?.classList.add('picked');
+    nb.classList.add('show');
+  } else {
+    nb.classList.remove('show');
+  }
+  nb.textContent=cur===queuedQs.length-1?'查看結果 →':'下一題 →';
+
+  // 返回按鈕：Q1 返回首頁，其他返回上一題
+  const pb=document.getElementById('btnPrev');
+  pb.style.visibility='visible';
+  pb.textContent=cur===0?'← 返回首頁':'← 上一題';
+}
+
+function pickOpt(idx,btn,q){
+  document.querySelectorAll('.opt').forEach(b=>b.classList.remove('picked'));
+  btn.classList.add('picked');
+  picked=idx;
+  answers[cur]=idx;
+  if(q.isSubQ) subLvl=q.levelOverride[idx];
+  document.getElementById('btnNext').classList.add('show');
+}
+
+function prevQ(){
+  if(cur===0){go('screen-welcome');return;}
+  cur--;
+  renderQ();
+}
+
+function nextQ(){
+  if(picked===null) return;
+  const q=queuedQs[cur];
+  answers[cur]=picked;
+
+  if(q.triggerSub){
+    const hadSubQ=queuedQs[cur+1]?.isSubQ;
+    const wantsSubQ=(picked===3);
+    if(wantsSubQ && !hadSubQ){
+      // 插入子題，同步 answers 陣列
+      queuedQs.splice(cur+1,0,SUB_Q1);
+      answers.splice(cur+1,0,undefined);
+    } else if(!wantsSubQ && hadSubQ){
+      // 移除子題，同步 answers 陣列
+      queuedQs.splice(cur+1,1);
+      answers.splice(cur+1,1);
+      subLvl=null;
+    }
+  }
+
+  cur++;
+  if(cur>=queuedQs.length) doCalc();
+  else renderQ();
+}
+
+/* ════════════════════════════════
+   計算（從 answers 陣列重新算分，不依賴遞增狀態）
+════════════════════════════════ */
+function doCalc(){
+  go('screen-calculating');
+  ['cs1','cs2','cs3','cs4','cs5'].forEach((id,i)=>
+    setTimeout(()=>document.getElementById(id).classList.add('show'),i*480+200));
+  setTimeout(()=>{
+    // 從 answers 重新計算各維度分數
+    const s={S:0,B:0,M:0,G:0};
+    subLvl=null;
+    queuedQs.forEach((q,i)=>{
+      if(answers[i]===undefined) return;
+      if(q.isSubQ){ subLvl=q.levelOverride[answers[i]]; }
+      else { s[q.dim]+=answers[i]; }
+    });
+
+    const Sp=Math.round(s.S/DIM_MAX.S*100);
+    const Bp=Math.round(s.B/DIM_MAX.B*100);
+    const Mp=Math.round(s.M/DIM_MAX.M*100);
+    const Gp=Math.round(s.G/DIM_MAX.G*100);
+    const overall=Math.round(Sp*0.40+Bp*0.30+Mp*0.20+Gp*0.10);
+
+    lvlKey=subLvl ? subLvl : LVL_ORDER[pctToLevel(overall)];
+    showResults(Sp,Bp,Mp,Gp,overall);
+  },3200);
+}
+
+/* ════════════════════════════════
+   結果頁
+════════════════════════════════ */
+function showResults(Sp,Bp,Mp,Gp,overall){
+  const d=LVL[lvlKey];
+  const lvlIdx=LVL_ORDER.indexOf(lvlKey);
+
+  // hero
+  const hero=document.getElementById('resHero');
+  hero.style.color=d.color;
+  document.getElementById('resBadgeTag').textContent=d.badge;
+  document.getElementById('resBadgeTag').style.color=d.color;
+  document.getElementById('resFreedom').textContent=d.freedom;
+  document.getElementById('resFreedom').style.color=d.color;
+  document.getElementById('resStage').textContent=d.stage;
+  const mottoEl=document.getElementById('resMotto');
+  mottoEl.textContent=d.motto+'　'+d.mottoEn;
+  mottoEl.style.color=d.color;
+
+  // score bars (animate)
+  setTimeout(()=>{
+    document.getElementById('barS').style.width=Sp+'%';
+    document.getElementById('barB').style.width=Bp+'%';
+    document.getElementById('barM').style.width=Mp+'%';
+    document.getElementById('barG').style.width=Gp+'%';
+    document.getElementById('pctS').textContent=Sp+'%';
+    document.getElementById('pctB').textContent=Bp+'%';
+    document.getElementById('pctM').textContent=Mp+'%';
+    document.getElementById('pctG').textContent=Gp+'%';
+  },300);
+
+  // advance / misalign (only for L1-L3; L4-L6 via subLvl)
+  const advBlock=document.getElementById('advanceBlock');
+  const misBlock=document.getElementById('misalignBlock');
+  advBlock.innerHTML=''; misBlock.innerHTML='';
+
+  if(!subLvl){
+    // 超前維度
+    const dimPcts={S:Sp,B:Bp,M:Mp,G:Gp};
+    const dimLabels={S:'財務現況',B:'財務行為',M:'財務思維',G:'財務目標'};
+    const ahead=[];
+    Object.keys(dimPcts).forEach(k=>{
+      if(pctToLevel(dimPcts[k])>lvlIdx) ahead.push(dimLabels[k]);
+    });
+    if(ahead.length>0){
+      advBlock.innerHTML=`<div class="insight-card advance" style="margin-bottom:16px">
+        <div class="insight-card-lbl">↑ 你已經走在前面了</div>
+        <div class="insight-card-txt">你的 <strong>${ahead.join('、')}</strong> 維度分數已超過整體財富層級，這不是問題，這是優勢。代表你在某些面向已具備更高層的思維或行為，繼續保持，讓其他維度跟上來。</div>
+      </div>`;
+    }
+    // 失衡偵測
+    if(Math.abs(pctToLevel(Sp)-pctToLevel(Bp))>=2){
+      const gap=pctToLevel(Sp)>pctToLevel(Bp)?
+        '你的財務現況（資產）已超過你的財務行為，行為跟不上資產，容易在市場波動時做出衝動決策。':
+        '你的財務行為已超過你的財務現況，你有正確的方向，但現在需要的是加速執行，讓實際資產趕上思維層次。';
+      misBlock.innerHTML=`<div class="insight-card misalign" style="margin-bottom:16px">
+        <div class="insight-card-lbl">⚡ 維度失衡提醒</div>
+        <div class="insight-card-txt">${gap}</div>
+      </div>`;
+    }
+  }
+
+  // strategy & mori
+  document.getElementById('resStrategy').textContent=d.strategy;
+  document.getElementById('resMori').innerHTML=d.mori;
+
+  // actions
+  const actEl=document.getElementById('resActions');
+  actEl.innerHTML='';
+  // 繼續保持 (keep)
+  const keepItems=buildKeep(Sp,Bp,Mp,Gp,lvlIdx);
+  if(keepItems.length>0){
+    actEl.innerHTML+=`<div class="actions-sub-lbl" style="color:var(--L2)">✓ 繼續保持</div><div class="action-list">`;
+    keepItems.forEach((t,i)=>{
+      actEl.innerHTML+=`<div class="action-item"><div class="action-num keep">${i+1}</div><div class="action-txt">${t}</div></div>`;
+    });
+    actEl.innerHTML+=`</div>`;
+  }
+  // 現在專注 (focus)
+  actEl.innerHTML+=`<div class="actions-sub-lbl" style="margin-top:${keepItems.length?'12px':'0'}">▶ 現在專注</div><div class="action-list">`;
+  d.focus.forEach((t,i)=>{
+    actEl.innerHTML+=`<div class="action-item"><div class="action-num">${i+1}</div><div class="action-txt">${t}</div></div>`;
+  });
+  actEl.innerHTML+=`</div>`;
+
+  go('screen-results');
+
+  // GSAP entrance
+  if(window.gsap){
+    gsap.from('.res-hero',{opacity:0,y:30,duration:.6,ease:'power2.out'});
+    gsap.from('.score-bars',{opacity:0,y:20,duration:.5,ease:'power2.out',delay:.2});
+    gsap.from('.res-body > *',{opacity:0,y:18,duration:.5,ease:'power2.out',stagger:.08,delay:.35});
+  }
+}
+
+function buildKeep(Sp,Bp,Mp,Gp,lvlIdx){
+  const items=[];
+  const threshold=65;
+  if(Sp>=threshold) items.push('你的財務現況管理穩健，持續維持目前的儲蓄與資產配置節奏');
+  if(Bp>=threshold) items.push('你的財務行為執行力強，自動化和定期定額習慣已建立，繼續堅持');
+  if(Mp>=threshold) items.push('你的財務思維超前同層次，在市場波動時能保持理性是稀有能力');
+  if(Gp>=threshold) items.push('你的財務目標視野清晰，長期規劃意識是多數人缺乏的');
+  return items.slice(0,2);
+}
+
+/* ════════════════════════════════
+   Email / skip
+════════════════════════════════ */
+async function submitEmail(){
+  const v=document.getElementById('emailInp').value.trim();
+  if(!v||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return;
+  document.getElementById('emailInp').disabled=true;
+  document.querySelector('.btn-subscribe').disabled=true;
+  document.getElementById('emailDone').style.display='block';
+  document.querySelector('.btn-skip-email').style.display='none';
+  if(CFG.mlKey&&CFG.mlGroup){
+    fetch('https://api.mailerlite.com/api/v2/subscribers',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-MailerLite-ApiKey':CFG.mlKey},
+      body:JSON.stringify({email:v,groups:[CFG.mlGroup],fields:{wealth_level:lvlKey?.toUpperCase()}}),
+    }).catch(()=>{});
+  }
+}
+
+function skipEmail(){
+  document.getElementById('emailBox').style.display='none';
+  downloadPDF();
+}
+
+/* ════════════════════════════════
+   PDF
+════════════════════════════════ */
+async function downloadPDF(){
+  if(!window.html2pdf){
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    document.head.appendChild(s);
+    await new Promise(r=>{s.onload=r});
+  }
+  const d=LVL[lvlKey];
+  html2pdf().set({
+    margin:10,
+    filename:`財富階梯診斷報告_${d.badge}.pdf`,
+    html2canvas:{scale:2,useCORS:true},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+  }).from(document.getElementById('screen-results')).save();
+}
+
+/* ════════════════════════════════
+   外部連結
+════════════════════════════════ */
+function openLine(){window.open(CFG.lineUrl,'_blank')}
+function openIG(){window.open(CFG.igUrl,'_blank')}
+function retake(){
+  selectedFears=[];
+  document.querySelectorAll('.fear-item').forEach(el=>el.classList.remove('picked'));
+  document.getElementById('fearCount').textContent='已選 0 個（最多 5 個）';
+  document.getElementById('fearCount').classList.remove('max');
+  document.getElementById('startBtn').disabled=true;
+  document.getElementById('emailBox').style.display='';
+  document.getElementById('emailInp').value='';
+  document.getElementById('emailInp').disabled=false;
+  document.querySelector('.btn-subscribe').disabled=false;
+  document.getElementById('emailDone').style.display='none';
+  document.querySelector('.btn-skip-email').style.display='';
+  go('screen-welcome');
+}
+
+/* ════════════════════════════════
+   Particles
+════════════════════════════════ */
+window.addEventListener('load',()=>{
+  if(window.particlesJS){
+    particlesJS('particles-js',{
+      particles:{
+        number:{value:38,density:{enable:true,value_area:900}},
+        color:{value:'#C4A96A'},
+        shape:{type:'circle'},
+        opacity:{value:.15,random:true,anim:{enable:true,speed:0.6,opacity_min:0.05,sync:false}},
+        size:{value:2,random:true},
+        line_linked:{enable:true,distance:160,color:'#5B8DB8',opacity:.07,width:1},
+        move:{enable:true,speed:0.5,direction:'none',random:true,out_mode:'out'},
+      },
+      interactivity:{
+        detect_on:'canvas',
+        events:{onhover:{enable:true,mode:'repulse'},onclick:{enable:false}},
+        modes:{repulse:{distance:80,duration:0.4}},
+      },
+      retina_detect:true,
+    });
+  }
+});
+
+/* ════════════════════════════════
+   Cloudflare 計數器（≥500 才顯示）
+════════════════════════════════ */
+if(CFG.cfCounter){
+  fetch(CFG.cfCounter).then(r=>r.json()).then(d=>{
+    if(d.count>=500){
+      const chip=document.createElement('div');
+      chip.style.cssText='font-size:12px;color:var(--muted);text-align:center;margin-top:12px';
+      chip.textContent=`已有 ${d.count.toLocaleString()} 人完成診斷`;
+      document.querySelector('.stats-row').after(chip);
+    }
+  }).catch(()=>{});
+}
+</script>
+
+<!-- CDNs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+</body>
+</html>
