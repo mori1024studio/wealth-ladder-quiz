@@ -516,8 +516,11 @@ body::before{content:'';position:fixed;inset:0;background:
 const CFG = {
   lineUrl: 'https://line.me/R/ti/p/@507wvwbz',
   igUrl:   'https://instagram.com/mori1024_',
-  mlKey:   '',       // MailerLite Classic API Key
-  mlGroup: '',       // MailerLite 群組 ID
+  mlKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiZTY0ZmY0YjJhYzcyMzM0ZTVlZjNmMzBlYTVlZjE0OWE5Mzg1ZDI2NDNiM2EzZmU3ZGUxYWVlMTA0NWZmMjFhYTJmN2FhYzQ5ODIwZDlhZmMiLCJpYXQiOjE3ODIyMjYxNDQuNjU1MzAzLCJuYmYiOjE3ODIyMjYxNDQuNjU1MzA3LCJleHAiOjQ5Mzc4OTk3NDQuNjQ5MjQ5LCJzdWIiOiIyNDQ5MDA2Iiwic2NvcGVzIjpbXX0.gXowQcDS-zoaY-A1We4MOAcjeaJ7RGc5VPB4EuXq2RR3vMyFfUmzeucHkxeNNj2DFyjtREnqFUOvTPL-y_rpvBKgNt22pwDgjfvb5pz9KB1zV_x_ULdOyGDFPQvYvmOcnDeXRTbZKSNQ7BrYHh_o1hFMiqc7YtGL9F3tsnYVi3ZyeFJStmeAxHP0493VIrR_FzKZS7l2fPG5ltaMomShz6T3MhEUCsLsGTfZc92ufHU1bRhXYdzQMkDpzVrhtZtd-ix-P_ym12GrORv5k5LOm69ts38rUQyCZR5dPxIrTFv2J1kEhhF-8uhQ9R6i6x0hf0Yv2KMVF-cDhoI9w6MTB_zXR58IiQ0W0xaeEwrEseCOwhFEUs7UIeMBVl5sopJViSOZBYRXbv67COxej5rNZM-RD6BZfDbiWJ_MTYLmOJ7BCpDKkZ04SzALl5E0McPR645u-Znf4eXMRgNTYrLUTOdQ6ez3BmmOZ3hhwA7toi1rXXaQJCBWlgs9g6bZeYKVoPdT8suaK6bXA9vaaA4-6c8yAhEyeXReB3gWzaJmQ6XCdBk5MRVOJ-gHZNHpibBz03MYRtKL6R1HM3GRBELXYQt3puu5IlHP_m9xk9FHKwH8WVkzvnSmU2SpUbHabozMNKSNeuopT9r3CAnAnd5WYdpZFeSMFcpr8MTjYTXOhuE',
+  mlGroup: {
+    l1:'191078823526139756', l2:'191078824131167783', l3:'191078824802256318',
+    l4:'191078825522628440', l5:'191078826208396302', l6:'191078826889971230',
+  },
   cfCounter: '',     // Cloudflare Workers counter URL
 };
 
@@ -970,11 +973,11 @@ async function submitEmail(){
             (surveyAnswers[1]==='A'||surveyAnswers[1]==='B')&&(surveyAnswers[2]==='A'||surveyAnswers[2]==='B')&&surveyAnswers[3]!=='D'?'client':
             surveyAnswers[1]==='C'||((surveyAnswers[2]==='A'||surveyAnswers[2]==='B')&&surveyAnswers[3]==='C')?'warm':'cold',
     email:v});
-  if(CFG.mlKey&&CFG.mlGroup){
-    fetch('https://api.mailerlite.com/api/v2/subscribers',{
+  if(CFG.mlKey&&CFG.mlGroup[lvlKey]){
+    fetch('https://connect.mailerlite.com/api/subscribers',{
       method:'POST',
-      headers:{'Content-Type':'application/json','X-MailerLite-ApiKey':CFG.mlKey},
-      body:JSON.stringify({email:v,groups:[CFG.mlGroup],fields:{wealth_level:lvlKey?.toUpperCase()}}),
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${CFG.mlKey}`},
+      body:JSON.stringify({email:v,groups:[CFG.mlGroup[lvlKey]]}),
     }).catch(()=>{});
   }
 }
@@ -1169,30 +1172,8 @@ function retake(){
   rafId=requestAnimationFrame(loop);
 })();
 
-/* ════════════════════════════════
-   Particles
-════════════════════════════════ */
-window.addEventListener('load',()=>{
-  if(window.particlesJS){
-    particlesJS('particles-js',{
-      particles:{
-        number:{value:38,density:{enable:true,value_area:900}},
-        color:{value:'#C4A96A'},
-        shape:{type:'circle'},
-        opacity:{value:.15,random:true,anim:{enable:true,speed:0.6,opacity_min:0.05,sync:false}},
-        size:{value:2,random:true},
-        line_linked:{enable:true,distance:160,color:'#5B8DB8',opacity:.07,width:1},
-        move:{enable:true,speed:0.5,direction:'none',random:true,out_mode:'out'},
-      },
-      interactivity:{
-        detect_on:'canvas',
-        events:{onhover:{enable:true,mode:'repulse'},onclick:{enable:false}},
-        modes:{repulse:{distance:80,duration:0.4}},
-      },
-      retina_detect:true,
-    });
-  }
-});
+/* ── MoriParticles ── */
+MoriParticles.init('quiz');
 
 /* ════════════════════════════════
    Cloudflare 計數器（≥500 才顯示）
@@ -1211,6 +1192,6 @@ if(CFG.cfCounter){
 
 <!-- CDNs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script src="https://mori-homepage.pages.dev/shared/particles.js"></script>
 </body>
 </html>
